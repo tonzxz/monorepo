@@ -1,0 +1,19 @@
+{
+  "name": "psms",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace web run dev",
+    "dev:all": "concurrently -n web,api -c \"cyan,green\" \"npm --workspace web run dev\" \"dotnet run --project services/api/src/Api/Api.csproj\"",
+    "build": "npm --workspace web run build",
+    "lint": "npm --workspace web run lint",
+    "api": "dotnet run --project services/api/src/Api/Api.csproj"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
