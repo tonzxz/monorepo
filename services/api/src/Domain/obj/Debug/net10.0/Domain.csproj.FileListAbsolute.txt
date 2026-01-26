@@ -9,3 +9,4 @@
 /Users/tonzxzzz/apps/quanby/psms/services/api/src/Domain/obj/Debug/net10.0/refint/Domain.dll
 /Users/tonzxzzz/apps/quanby/psms/services/api/src/Domain/obj/Debug/net10.0/Domain.pdb
 /Users/tonzxzzz/apps/quanby/psms/services/api/src/Domain/obj/Debug/net10.0/ref/Domain.dll
+/Users/tonzxzzz/apps/quanby/psms/services/api/src/Domain/obj/Debug/net10.0/Domain.sourcelink.json
