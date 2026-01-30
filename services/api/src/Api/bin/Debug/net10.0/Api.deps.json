@@ -9,14 +9,37 @@
       "Api/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
+          "AspNet.Security.OAuth.GitHub": "10.0.0",
+          "DotNetEnv": "3.1.1",
           "Infrastructure": "1.0.0",
+          "Microsoft.AspNetCore.Authentication.Google": "10.0.2",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.2",
+          "Microsoft.AspNetCore.Authentication.MicrosoftAccount": "10.0.2",
           "Microsoft.AspNetCore.OpenApi": "10.0.2",
           "Microsoft.EntityFrameworkCore.Design": "10.0.2",
           "Swashbuckle.AspNetCore": "10.1.0"
         },
         "runtime": {
           "Api.dll": {}
+        }
+      },
+      "AspNet.Security.OAuth.GitHub/10.0.0": {
+        "runtime": {
+          "lib/net10.0/AspNet.Security.OAuth.GitHub.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.56155"
+          }
+        }
+      },
+      "DotNetEnv/3.1.1": {
+        "dependencies": {
+          "Sprache": "2.3.1"
+        },
+        "runtime": {
+          "lib/netstandard1.3/DotNetEnv.dll": {
+            "assemblyVersion": "3.1.1.0",
+            "fileVersion": "3.1.1.0"
+          }
         }
       },
       "Humanizer.Core/2.14.1": {
@@ -27,12 +50,28 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Authentication.Google/10.0.2": {
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "assemblyVersion": "10.0.2.0",
+            "fileVersion": "10.0.225.61305"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/10.0.2": {
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         },
         "runtime": {
           "lib/net10.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "assemblyVersion": "10.0.2.0",
+            "fileVersion": "10.0.225.61305"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.MicrosoftAccount/10.0.2": {
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Authentication.MicrosoftAccount.dll": {
             "assemblyVersion": "10.0.2.0",
             "fileVersion": "10.0.225.61305"
           }
@@ -517,6 +556,14 @@
           }
         }
       },
+      "Sprache/2.3.1": {
+        "runtime": {
+          "lib/netstandard2.1/Sprache.dll": {
+            "assemblyVersion": "2.3.1.0",
+            "fileVersion": "2.3.1.0"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/10.1.0": {
         "dependencies": {
           "Swashbuckle.AspNetCore.Swagger": "10.1.0",
@@ -676,6 +723,20 @@
       "serviceable": false,
       "sha512": ""
     },
+    "AspNet.Security.OAuth.GitHub/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-PbOrAso/hlCS2p3YHHq94C5W/6851xyMT8ZEkAc3eGQNlsu3Siwu/D98nzCKyOKmB+KNu9MirWpmO66PmEIexQ==",
+      "path": "aspnet.security.oauth.github/10.0.0",
+      "hashPath": "aspnet.security.oauth.github.10.0.0.nupkg.sha512"
+    },
+    "DotNetEnv/3.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o4SqUVCq0pqHF/HYsZk6k22XGIVmvsDVo+Dy7l0ubq9uQ45JkXswrMRJmYvhGLXWFYF0M5OupMonytB+0zvpGQ==",
+      "path": "dotnetenv/3.1.1",
+      "hashPath": "dotnetenv.3.1.1.nupkg.sha512"
+    },
     "Humanizer.Core/2.14.1": {
       "type": "package",
       "serviceable": true,
@@ -683,12 +744,26 @@
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
     },
+    "Microsoft.AspNetCore.Authentication.Google/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tls7egsHsKjn4sxYmA8wwNGM+U+acpIPh1JOqFXxjG+YYn8/HOEwyO6kdFqyaqtjV2aI2ZUhGkMqYdKtlY266A==",
+      "path": "microsoft.aspnetcore.authentication.google/10.0.2",
+      "hashPath": "microsoft.aspnetcore.authentication.google.10.0.2.nupkg.sha512"
+    },
     "Microsoft.AspNetCore.Authentication.JwtBearer/10.0.2": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-UJGH1qpJgNSmDcAQQRtdUY/auztO+EJK4HHz3akdneWQ+3ladiLEMJeZOqjYiMcPf/h+MSAQq+xij+7umi7VXQ==",
       "path": "microsoft.aspnetcore.authentication.jwtbearer/10.0.2",
       "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.10.0.2.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.MicrosoftAccount/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6e25F1AnaKwvN9VZJWIzH4VFbT28VUgVP1I07X7AVM1stEGQP2Ik5iO1kL9/k+r4FmJXrCOrkVywTasGZBMr/w==",
+      "path": "microsoft.aspnetcore.authentication.microsoftaccount/10.0.2",
+      "hashPath": "microsoft.aspnetcore.authentication.microsoftaccount.10.0.2.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.2": {
       "type": "package",
@@ -864,6 +939,13 @@
       "sha512": "sha512-E2+uSWxSB8LdsUVwPaqRWOcGOP92biry2JEwc0KJMdLJF+aZdczeIdEXVwEyv4nSVMQJH0o8tLhyAMiR6VF0lw==",
       "path": "npgsql.entityframeworkcore.postgresql/10.0.0",
       "hashPath": "npgsql.entityframeworkcore.postgresql.10.0.0.nupkg.sha512"
+    },
+    "Sprache/2.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Q+mXeiTxiUYG3lKYF6TS82/SyB4F2613Q1yXTMwg4jWGHEEVC3yrzHtNcI4B3qnDI0+eJsezGJ0V+cToUytHWw==",
+      "path": "sprache/2.3.1",
+      "hashPath": "sprache.2.3.1.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/10.1.0": {
       "type": "package",

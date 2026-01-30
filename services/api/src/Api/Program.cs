@@ -9,7 +9,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+// Load .env file
+var root = Directory.GetCurrentDirectory();
+var dotenvPath = Path.Combine(root, "../../.env");
+
+if (File.Exists(dotenvPath))
+{
+    DotNetEnv.Env.Load(dotenvPath);
+}
+
 var builder = WebApplication.CreateBuilder(args);
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 // Core API services.
 builder.Services.AddControllers();
@@ -29,8 +50,11 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 // Database configuration.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"];
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+}
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -60,7 +84,23 @@ if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey))
 }
 
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = "Identity.External";
+    })
+    .AddCookie("Identity.Application", options =>
+    {
+        options.Cookie.Name = "Identity.Application";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    })
+    .AddCookie("Identity.External", options =>
+    {
+        options.Cookie.Name = "Identity.External";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.SlidingExpiration = false;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -75,6 +115,46 @@ builder.Services
         };
     });
 
+// OAuth providers - only configure if credentials exist
+var authBuilder = builder.Services.AddAuthentication();
+
+var googleClientId = Environment.GetEnvironmentVariable("Authentication__Google__ClientId");
+var googleClientSecret = Environment.GetEnvironmentVariable("Authentication__Google__ClientSecret");
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.SaveTokens = true;
+    });
+}
+
+var msClientId = Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientId");
+var msClientSecret = Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientSecret");
+if (!string.IsNullOrWhiteSpace(msClientId) && !string.IsNullOrWhiteSpace(msClientSecret))
+{
+    authBuilder.AddMicrosoftAccount(options =>
+    {
+        options.ClientId = msClientId;
+        options.ClientSecret = msClientSecret;
+        options.SaveTokens = true;
+    });
+}
+
+var githubClientId = Environment.GetEnvironmentVariable("Authentication__GitHub__ClientId");
+var githubClientSecret = Environment.GetEnvironmentVariable("Authentication__GitHub__ClientSecret");
+if (!string.IsNullOrWhiteSpace(githubClientId) && !string.IsNullOrWhiteSpace(githubClientSecret))
+{
+    authBuilder.AddGitHub(options =>
+    {
+        options.ClientId = githubClientId;
+        options.ClientSecret = githubClientSecret;
+        options.SaveTokens = true;
+        options.Scope.Add("user:email");
+    });
+}
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -86,27 +166,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure default roles exist.
-await SeedRolesAsync(app);
+// Seed database with required data
+using (var scope = app.Services.CreateScope())
+{
+    // Pass true to seed sample data in development, false in production
+    await DbSeeder.SeedAsync(scope.ServiceProvider, app.Environment.IsDevelopment());
+}
 
 app.Run();
-
-static async Task SeedRolesAsync(WebApplication app)
-{
-    using var scope = app.Services.CreateScope();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var roles = new[] { "User", "Admin" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-}
