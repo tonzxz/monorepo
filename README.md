@@ -26,27 +26,46 @@ Full-stack monorepo with React (Vite) on the frontend and ASP.NET Core on the ba
 - **Web -> Supabase**: Browser client uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - **API -> Database**: API connects to Postgres via `DATABASE_URL`.
 
-## Local Development
+## Getting Started
+
+### 1) Install dependencies
 
 ```
-# frontend
-npm run dev
-
-# api
-npm run api
+npm install
 ```
 
-Single command (frontend + backend):
+### 1b) Install .NET SDK (API)
+
+Install the .NET SDK (10.x) from Microsoft, then restore the API:
 
 ```
-npm run dev:all
+cd services/api/src/Api
+dotnet restore
 ```
 
-## Local Postgres
+### 2) Configure environment variables
+
+Web (`apps/web/.env`):
+
+```
+VITE_API_URL=http://localhost:5000
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
+
+API (`services/api/.env`):
+
+```
+DATABASE_URL=postgresql://...
+JWT__ISSUER=psms
+JWT__AUDIENCE=psms
+JWT__SIGNINGKEY=CHANGE_ME
+```
+
+### 3) Run local Postgres (optional)
 
 ```
 cd infra/local
-
 docker compose up -d
 ```
 
@@ -54,6 +73,26 @@ Default connection string:
 
 ```
 postgresql://postgres:postgres@localhost:5432/psms?schema=public
+```
+
+### 4) Run the apps
+
+Frontend:
+
+```
+npm run dev
+```
+
+API:
+
+```
+npm run api
+```
+
+Single command (frontend + API):
+
+```
+npm run dev:all
 ```
 
 ## Supabase
@@ -67,21 +106,6 @@ See `infra/supabase/README.md`.
 
 High-level checklist in `infra/aws/README.md`.
 
-## Environment Variables
+## Database & Migrations
 
-Web:
-
-```
-VITE_API_URL=http://localhost:5000
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-```
-
-API:
-
-```
-DATABASE_URL=postgresql://...
-JWT__ISSUER=psms
-JWT__AUDIENCE=psms
-JWT__SIGNINGKEY=CHANGE_ME
-```
+See `services/api/DATABASE_COMMANDS.md` for migrations, updates, and seeding.
