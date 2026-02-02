@@ -11,11 +11,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { SearchInput } from "@/components/common/dynamic/search"
+import { ProcessingState } from "@/components/common/dynamic/processing"
 
-export default function DepartmentManagementPage() {
+export default function ApprovalSequencePage() {
+  const [query, setQuery] = useState("")
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -30,7 +35,7 @@ export default function DepartmentManagementPage() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Department Management</BreadcrumbPage>
+                  <BreadcrumbPage>Approval Sequence</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -39,26 +44,36 @@ export default function DepartmentManagementPage() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Department Management</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Approval Sequence</h1>
               <p className="text-muted-foreground">
-                Organize teams and manage department hierarchies.
+                Configure approval workflows and manage request flows.
               </p>
             </div>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Department
+              Create Sequence
             </Button>
           </div>
           
           <Card>
             <CardHeader>
-              <CardTitle>Departments</CardTitle>
+              <CardTitle>Approval Workflows</CardTitle>
               <CardDescription>
-                Manage organizational departments and their structure
+                Design and manage approval sequences for different processes
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Department management interface will be implemented here.</p>
+              <SearchInput
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onClear={() => setQuery("")}
+                placeholder="Search workflows..."
+                containerClassName="mb-4"
+              />
+              <ProcessingState
+                title="Loading workflows"
+                description="Fetching approval sequences for this role."
+              />
             </CardContent>
           </Card>
         </div>

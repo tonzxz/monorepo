@@ -14,15 +14,17 @@ Defines user roles and their hierarchy relationships.
 
 ### Role Types
 ```tsx
-export type Role = "Admin" | "Manager" | "User"
+export type Role = "SuperAdmin" | "Enduser" | "Supply" | "Supplier" | "Inspection"
 ```
 
 ### Role Hierarchy
 ```tsx
 export const roleHierarchy: Record<Role, Role[]> = {
-  Admin: ["Admin", "Manager", "User"],    // Admin has all permissions
-  Manager: ["Manager", "User"],           // Manager has Manager + User permissions  
-  User: ["User"]                          // User has only User permissions
+  SuperAdmin: ["SuperAdmin", "Supply", "Supplier", "Inspection", "Enduser"],
+  Supply: ["Supply", "Enduser"],
+  Supplier: ["Supplier", "Enduser"],
+  Inspection: ["Inspection", "Enduser"],
+  Enduser: ["Enduser"]
 }
 ```
 
@@ -31,8 +33,8 @@ export const roleHierarchy: Record<Role, Role[]> = {
 import { Role, roleHierarchy } from "./roles"
 
 // Check if user role includes target role
-const userRoles = roleHierarchy[user.role] // ['Manager', 'User'] for Manager
-const canAccessUserFeatures = userRoles.includes('User') // true
+const userRoles = roleHierarchy[user.role] // ['Supply', 'Enduser'] for Supply
+const canAccessEnduserFeatures = userRoles.includes('Enduser') // true
 ```
 
 ## 🔑 permissions.ts
@@ -42,7 +44,7 @@ Defines granular permissions and maps them to roles.
 ```tsx
 export type Permission = 
   | "dashboard:read"
-  | "inventory:read" | "inventory:write" | "inventory:delete"
+  | "ppmp:read" | "ppmp:write" | "ppmp:delete"
   | "users:read" | "users:write" | "users:delete"
   | "departments:read" | "departments:write" | "departments:delete"
   | "approval-sequence:read" | "approval-sequence:write" | "approval-sequence:delete"
@@ -51,16 +53,16 @@ export type Permission =
 ### Role Permission Mapping
 ```tsx
 export const rolePermissions: Record<Role, Permission[]> = {
-  Admin: [
-    "dashboard:read", "inventory:write", "users:write", 
+  SuperAdmin: [
+    "dashboard:read", "ppmp:write", "users:write",
     "departments:write", "approval-sequence:write", ...
   ],
-  Manager: [
-    "dashboard:read", "inventory:read", "users:read",
-    "departments:write", "approval-sequence:write", ...
+  Supply: [
+    "dashboard:read", "ppmp:read", "ppmp:write",
+    "approval-sequence:read"
   ],
-  User: [
-    "dashboard:read", "inventory:read"
+  Enduser: [
+    "dashboard:read", "ppmp:read"
   ]
 }
 ```
@@ -69,10 +71,10 @@ export const rolePermissions: Record<Role, Permission[]> = {
 ```tsx
 export const PERMISSIONS = {
   DASHBOARD: { READ: "dashboard:read" as const },
-  INVENTORY: {
-    READ: "inventory:read" as const,
-    WRITE: "inventory:write" as const,
-    DELETE: "inventory:delete" as const
+  PPMP: {
+    READ: "ppmp:read" as const,
+    WRITE: "ppmp:write" as const,
+    DELETE: "ppmp:delete" as const
   },
   // ... more organized permissions
 } as const
@@ -83,8 +85,8 @@ export const PERMISSIONS = {
 import { PERMISSIONS } from "./permissions"
 
 // Use in route protection
-<RequirePermission permissions={[PERMISSIONS.INVENTORY.WRITE]}>
-  <AddInventoryForm />
+<RequirePermission permissions={[PERMISSIONS.PPMP.WRITE]}>
+  <AddPpmpItemForm />
 </RequirePermission>
 ```
 
@@ -130,12 +132,12 @@ import { createAbility } from "./ability"
 const ability = createAbility(user)
 
 // Check permissions
-if (ability.can('inventory:write')) {
+if (ability.can('ppmp:write')) {
   // Show edit button
 }
 
 // Check roles
-if (ability.hasRole('Admin')) {
+if (ability.hasRole('SuperAdmin')) {
   // Show admin features
 }
 
@@ -161,7 +163,7 @@ Protects routes that require any authenticated user.
 #### RequireRole
 Protects routes that require specific roles.
 ```tsx
-<RequireRole roles={['Admin', 'Manager']}>
+<RequireRole roles={['SuperAdmin', 'Supply']}>
   <AdminDashboard />
 </RequireRole>
 ```
@@ -170,10 +172,10 @@ Protects routes that require specific roles.
 Protects routes that require specific permissions.
 ```tsx
 <RequirePermission 
-  permissions={['inventory:write']} 
+  permissions={['ppmp:write']} 
   requireAll={true} // default: true
 >
-  <InventoryEditor />
+  <PpmpEditor />
 </RequirePermission>
 ```
 
@@ -183,31 +185,31 @@ Protects routes that require specific permissions.
 const ProtectedComponent = withAuth(MyComponent)
 
 // Wrap components with role requirement
-const AdminComponent = withRole(MyComponent, ['Admin'])
+const AdminComponent = withRole(MyComponent, ['SuperAdmin'])
 
 // Wrap components with permission requirement
-const EditorComponent = withPermission(MyComponent, ['inventory:write'])
+const EditorComponent = withPermission(MyComponent, ['ppmp:write'])
 ```
 
 ## 🎯 Real-World Usage Examples
 
 ### 1. Conditional UI Elements
 ```tsx
-function InventoryPage() {
+function PpmpPage() {
   const { user } = useAuth()
   const ability = createAbility(user)
   
   return (
     <div>
-      <h1>Inventory</h1>
+      <h1>PPMP</h1>
       
       {/* Show add button only if user can write */}
-      {ability.can(PERMISSIONS.INVENTORY.WRITE) && (
+      {ability.can(PERMISSIONS.PPMP.WRITE) && (
         <Button>Add Item</Button>
       )}
       
       {/* Show delete only for admins */}
-      {ability.hasRole('Admin') && (
+      {ability.hasRole('SuperAdmin') && (
         <Button variant="destructive">Delete All</Button>
       )}
     </div>
@@ -257,9 +259,9 @@ function UserForm() {
       {/* Role selection only for users with write permission */}
       {ability.can(PERMISSIONS.USERS.WRITE) && (
         <Select name="role">
-          <option value="User">User</option>
-          {ability.hasRole('Admin') && (
-            <option value="Admin">Admin</option>
+          <option value="Enduser">Enduser</option>
+          {ability.hasRole('SuperAdmin') && (
+            <option value="SuperAdmin">SuperAdmin</option>
           )}
         </Select>
       )}
@@ -283,9 +285,9 @@ export type Permission =
 ### Step 2: Add to Role Mappings
 ```tsx
 export const rolePermissions: Record<Role, Permission[]> = {
-  Admin: [...existing, "new-feature:write", "new-feature:delete"],
-  Manager: [...existing, "new-feature:read", "new-feature:write"],
-  User: [...existing, "new-feature:read"]
+  SuperAdmin: [...existing, "new-feature:write", "new-feature:delete"],
+  Supply: [...existing, "new-feature:read", "new-feature:write"],
+  Enduser: [...existing, "new-feature:read"]
 }
 ```
 

@@ -11,11 +11,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { SearchInput } from "@/components/common/dynamic/search"
+import { StatCardGrid } from "@/components/common/dynamic/cards"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const [activityQuery, setActivityQuery] = useState("")
   
   // Extract first name from email or use email username
   const getGreeting = () => {
@@ -61,70 +65,47 @@ export default function DashboardPage() {
             </p>
           </div>
           
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Items
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Pending Approvals
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">23</div>
-                <p className="text-xs text-muted-foreground">
-                  +4 from yesterday
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Users
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">45</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 this week
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Departments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">
-                  No change
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <StatCardGrid
+            items={[
+              {
+                title: "Total Items",
+                value: "1,234",
+                description: "+20.1% from last month",
+              },
+              {
+                title: "Pending Approvals",
+                value: "23",
+                description: "+4 from yesterday",
+              },
+              {
+                title: "Active Users",
+                value: "45",
+                description: "+2 this week",
+              },
+              {
+                title: "Departments",
+                value: "12",
+                description: "No change",
+              },
+            ]}
+          />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>
-                  Latest inventory and approval activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>
+                Latest inventory and approval activities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SearchInput
+                value={activityQuery}
+                onChange={(event) => setActivityQuery(event.target.value)}
+                onClear={() => setActivityQuery("")}
+                placeholder="Search activity..."
+                containerClassName="mb-4"
+              />
+              <div className="space-y-4">
                   <div className="flex items-center">
                     <div className="ml-4 space-y-1">
                       <p className="text-sm font-medium leading-none">

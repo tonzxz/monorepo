@@ -50,15 +50,16 @@ public static class DbSeeder
     {
         var adminEmail = "admin@quanbyit.com";
         
-        if (await userManager.FindByEmailAsync(adminEmail) == null)
+        var admin = await userManager.FindByEmailAsync(adminEmail);
+
+        if (admin == null)
         {
-            var admin = new ApplicationUser
+            admin = new ApplicationUser
             {
                 Email = adminEmail,
                 UserName = adminEmail,
                 EmailConfirmed = true,
-                Address = "123 Admin Street, City, Country"  
-
+                Address = "123 Admin Street, City, Country"
             };
 
             var result = await userManager.CreateAsync(admin, "@Test123");
@@ -71,7 +72,14 @@ public static class DbSeeder
             else
             {
                 Console.WriteLine($"Failed to create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                return;
             }
+        }
+
+        if (!await userManager.IsInRoleAsync(admin, "SuperAdmin"))
+        {
+            await userManager.AddToRoleAsync(admin, "SuperAdmin");
+            Console.WriteLine($"Added SuperAdmin role to: {adminEmail}");
         }
     }
 

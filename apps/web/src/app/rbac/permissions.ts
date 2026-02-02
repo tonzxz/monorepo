@@ -2,9 +2,9 @@ import type { Role } from "./roles";
 
 export type Permission =
   | "dashboard:read"
-  | "inventory:read"
-  | "inventory:write"
-  | "inventory:delete"
+  | "ppmp:read"
+  | "ppmp:write"
+  | "ppmp:delete"
   | "users:read"
   | "users:write"
   | "users:delete"
@@ -18,9 +18,9 @@ export type Permission =
 export const rolePermissions: Record<Role, Permission[]> = {
   SuperAdmin: [
     "dashboard:read",
-    "inventory:read",
-    "inventory:write",
-    "inventory:delete",
+    "ppmp:read",
+    "ppmp:write",
+    "ppmp:delete",
     "users:read",
     "users:write",
     "users:delete",
@@ -33,23 +33,23 @@ export const rolePermissions: Record<Role, Permission[]> = {
   ],
   Supply: [
     "dashboard:read",
-    "inventory:read",
-    "inventory:write",
+    "ppmp:read",
+    "ppmp:write",
     "approval-sequence:read"
   ],
   Supplier: [
     "dashboard:read",
-    "inventory:read",
+    "ppmp:read",
     "approval-sequence:read"
   ],
   Inspection: [
     "dashboard:read",
-    "inventory:read",
+    "ppmp:read",
     "approval-sequence:read"
   ],
   Enduser: [
     "dashboard:read",
-    "inventory:read"
+    "ppmp:read"
   ]
 };
 
@@ -57,10 +57,10 @@ export const PERMISSIONS = {
   DASHBOARD: {
     READ: "dashboard:read" as const
   },
-  INVENTORY: {
-    READ: "inventory:read" as const,
-    WRITE: "inventory:write" as const,
-    DELETE: "inventory:delete" as const
+  PPMP: {
+    READ: "ppmp:read" as const,
+    WRITE: "ppmp:write" as const,
+    DELETE: "ppmp:delete" as const
   },
   USERS: {
     READ: "users:read" as const,

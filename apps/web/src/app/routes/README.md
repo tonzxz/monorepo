@@ -16,9 +16,9 @@ export const appRoutes = [
     permissions: ['dashboard:read']
   },
   {
-    path: '/app/inventory',
+    path: '/app/ppmp',
     element: <InventoryPage />,
-    permissions: ['inventory:read']
+    permissions: ['ppmp:read']
   }
   // ... more routes
 ]
@@ -104,14 +104,14 @@ export function generateRoutes(routeConfigs: RouteConfig[]) {
 ### Route-Based Code Splitting
 ```tsx
 // routes/lazyRoutes.ts
-const InventoryPage = lazy(() => import('@/features/inventory/pages/InventoryPage'));
-const UserManagementPage = lazy(() => import('@/features/user-management/pages/UserManagementPage'));
+const InventoryPage = lazy(() => import('@/features/enduser/ppmp/inventory/pages/InventoryPage'));
+const UserManagementPage = lazy(() => import('@/features/superadmin/user-management/pages/UserManagementPage'));
 
 export const lazyRoutes = [
   {
-    path: '/app/inventory',
+    path: '/app/ppmp',
     element: <Suspense fallback={<Loading />}><InventoryPage /></Suspense>,
-    permissions: ['inventory:read']
+    permissions: ['ppmp:read']
   }
 ];
 ```

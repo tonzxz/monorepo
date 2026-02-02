@@ -52,7 +52,7 @@ const { user, login, logout, isAuthenticated } = useAuth()
 interface User {
   id: string
   email: string
-  role: 'Admin' | 'Manager' | 'User'
+  role: 'SuperAdmin' | 'Supply' | 'Supplier' | 'Inspection' | 'Enduser'
   permissions?: Permission[]
 }
 ```
@@ -64,13 +64,15 @@ interface User {
 
 #### `roles.ts` - Role Definitions
 ```tsx
-export type Role = "Admin" | "User" | "Manager"
+export type Role = "SuperAdmin" | "Enduser" | "Supply" | "Supplier" | "Inspection"
 
-// Role hierarchy (Admin > Manager > User)
+// Role hierarchy (SuperAdmin > Supply/Supplier/Inspection > Enduser)
 export const roleHierarchy: Record<Role, Role[]> = {
-  Admin: ["Admin", "Manager", "User"],
-  Manager: ["Manager", "User"],  
-  User: ["User"]
+  SuperAdmin: ["SuperAdmin", "Supply", "Supplier", "Inspection", "Enduser"],
+  Supply: ["Supply", "Enduser"],
+  Supplier: ["Supplier", "Enduser"],
+  Inspection: ["Inspection", "Enduser"],
+  Enduser: ["Enduser"]
 }
 ```
 
@@ -79,15 +81,15 @@ export const roleHierarchy: Record<Role, Role[]> = {
 // All available permissions
 export type Permission = 
   | "dashboard:read"
-  | "inventory:read" | "inventory:write" | "inventory:delete"
+  | "ppmp:read" | "ppmp:write" | "ppmp:delete"
   | "users:read" | "users:write" | "users:delete"
   // ... more permissions
 
 // Role to permission mapping
 export const rolePermissions: Record<Role, Permission[]> = {
-  Admin: ["dashboard:read", "inventory:write", "users:write", ...],
-  Manager: ["dashboard:read", "inventory:read", "users:read", ...],
-  User: ["dashboard:read", "inventory:read"]
+  SuperAdmin: ["dashboard:read", "ppmp:write", "users:write", ...],
+  Supply: ["dashboard:read", "ppmp:read", "approval-sequence:read", ...],
+  Enduser: ["dashboard:read", "ppmp:read"]
 }
 ```
 
@@ -108,7 +110,7 @@ export class Ability {
 
 // Usage:
 const ability = createAbility(user)
-if (ability.can('inventory:write')) {
+if (ability.can('ppmp:write')) {
   // Show edit button
 }
 ```
@@ -121,7 +123,7 @@ if (ability.can('inventory:write')) {
 </RequireAuth>
 
 // Require specific roles
-<RequireRole roles={['Admin', 'Manager']}>
+<RequireRole roles={['SuperAdmin', 'Supply']}>
   <AdminPanel />
 </RequireRole>
 
@@ -225,12 +227,12 @@ const { user } = useAuth()
 const ability = createAbility(user)
 
 // Check permissions
-if (ability.can('inventory:write')) {
+if (ability.can('ppmp:write')) {
   // Show edit functionality
 }
 
 // Check roles
-if (ability.hasRole('Admin')) {
+if (ability.hasRole('SuperAdmin')) {
   // Show admin features
 }
 ```
@@ -241,22 +243,22 @@ if (ability.hasRole('Admin')) {
 
 ### Example 1: Conditional Button Rendering
 ```tsx
-function InventoryPage() {
+function PpmpPage() {
   const { user } = useAuth()
   const ability = createAbility(user)
   
   return (
     <div>
-      <h1>Inventory</h1>
+      <h1>PPMP</h1>
       <ItemsList />
       
       {/* Only show add button if user can write */}
-      {ability.can(PERMISSIONS.INVENTORY.WRITE) && (
+      {ability.can(PERMISSIONS.PPMP.WRITE) && (
         <Button>Add Item</Button>
       )}
       
       {/* Only show delete for admins */}
-      {ability.hasRole('Admin') && (
+      {ability.hasRole('SuperAdmin') && (
         <Button variant="destructive">Delete All</Button>
       )}
     </div>
@@ -277,10 +279,10 @@ function UserForm() {
       {/* Only admins can assign roles */}
       {ability.can(PERMISSIONS.USERS.WRITE) && (
         <Select placeholder="Role">
-          <option value="User">User</option>
-          <option value="Manager">Manager</option>
-          {ability.hasRole('Admin') && (
-            <option value="Admin">Admin</option>
+          <option value="Enduser">Enduser</option>
+          <option value="Supply">Supply</option>
+          {ability.hasRole('SuperAdmin') && (
+            <option value="SuperAdmin">SuperAdmin</option>
           )}
         </Select>
       )}
@@ -291,11 +293,11 @@ function UserForm() {
 
 ### Example 3: Page-Level Access Control
 ```tsx
-function AdminDashboard() {
+function SuperAdminDashboard() {
   return (
-    <RequireRole roles={['Admin']}>
+    <RequireRole roles={['SuperAdmin']}>
       <div>
-        <h1>Admin Dashboard</h1>
+        <h1>SuperAdmin Dashboard</h1>
         <SystemSettings />
         <UserManagement />
         <SecurityLogs />
@@ -312,10 +314,10 @@ function AdminDashboard() {
 ```tsx
 PERMISSIONS = {
   DASHBOARD: { READ: "dashboard:read" },
-  INVENTORY: {
-    READ: "inventory:read",
-    WRITE: "inventory:write", 
-    DELETE: "inventory:delete"
+  PPMP: {
+    READ: "ppmp:read",
+    WRITE: "ppmp:write", 
+    DELETE: "ppmp:delete"
   },
   USERS: {
     READ: "users:read",

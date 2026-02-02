@@ -11,11 +11,30 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useState, type FormEvent } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { SearchInput } from "@/components/common/dynamic/search"
+import { StatCardGrid } from "@/components/common/dynamic/cards"
+import { CreateModal } from "@/components/common/dynamic/create-modal"
+import { Input } from "@/components/ui/input"
 
 export default function InventoryPage() {
+  const [query, setQuery] = useState("")
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [newItemName, setNewItemName] = useState("")
+  const [newItemCategory, setNewItemCategory] = useState("")
+  const [newItemQuantity, setNewItemQuantity] = useState("")
+
+  const handleCreate = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsCreateOpen(false)
+    setNewItemName("")
+    setNewItemCategory("")
+    setNewItemQuantity("")
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -44,66 +63,36 @@ export default function InventoryPage() {
                 Manage your inventory items and track stock levels.
               </p>
             </div>
-            <Button>
+            <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Add Item
             </Button>
           </div>
-          
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Items
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Low Stock
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">23</div>
-                <p className="text-xs text-muted-foreground">
-                  Items below threshold
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Categories
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">45</div>
-                <p className="text-xs text-muted-foreground">
-                  Active categories
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Value
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₱2.1M</div>
-                <p className="text-xs text-muted-foreground">
-                  Total inventory value
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+
+          <StatCardGrid
+            items={[
+              {
+                title: "Total Items",
+                value: "1,234",
+                description: "+20.1% from last month",
+              },
+              {
+                title: "Low Stock",
+                value: "23",
+                description: "Items below threshold",
+              },
+              {
+                title: "Categories",
+                value: "45",
+                description: "Active categories",
+              },
+              {
+                title: "Total Value",
+                value: "₱2.1M",
+                description: "Total inventory value",
+              },
+            ]}
+          />
 
           <Card>
             <CardHeader>
@@ -113,6 +102,13 @@ export default function InventoryPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <SearchInput
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onClear={() => setQuery("")}
+                placeholder="Search items..."
+                containerClassName="mb-4"
+              />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -140,6 +136,34 @@ export default function InventoryPage() {
           </Card>
         </div>
       </SidebarInset>
+
+      <CreateModal
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        title="Add Item"
+        description="Create a new inventory item."
+        submitText="Create Item"
+        onSubmit={handleCreate}
+      >
+        <Input
+          placeholder="Item name"
+          value={newItemName}
+          onChange={(event) => setNewItemName(event.target.value)}
+          required
+        />
+        <Input
+          placeholder="Category"
+          value={newItemCategory}
+          onChange={(event) => setNewItemCategory(event.target.value)}
+        />
+        <Input
+          placeholder="Quantity"
+          value={newItemQuantity}
+          onChange={(event) => setNewItemQuantity(event.target.value)}
+          type="number"
+          min={0}
+        />
+      </CreateModal>
     </SidebarProvider>
   )
 }

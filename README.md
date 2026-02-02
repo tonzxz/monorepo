@@ -20,6 +20,26 @@ Full-stack monorepo with React (Vite) on the frontend and ASP.NET Core on the ba
   docs/                      # Architecture notes, ADRs
 ```
 
+Frontend feature structure:
+
+```
+apps/web/src/features/
+  enduser/
+    app/                     # End-user app pages (dashboard, etc.)
+    ppmp/                    # End-user PPMP pages (inventory, etc.)
+  shared/
+    ppmp/                    # Shared PPMP pages (Enduser + Inspection)
+  superadmin/
+    user-management/         # Super admin pages
+    department-management/
+    approval-sequence/
+  auth/
+  not-found/
+```
+
+RBAC access rules live in `apps/web/src/app/rbac/permissions.ts`. Use roles + permissions
+directly in routes and sidebar items.
+
 ## How the Pieces Connect
 
 - **Web -> API**: HTTP calls to `VITE_API_URL`.

@@ -1,15 +1,16 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import DashboardPage from "../features/dashboard/pages/DashboardPage";
-import InventoryPage from "../features/inventory/pages/InventoryPage";
+import DashboardPage from "../features/enduser/app/dashboard/pages/DashboardPage";
+import InventoryPage from "../features/enduser/ppmp/inventory/pages/InventoryPage";
 import LoginPage from "../features/auth/pages/LoginPage";
 import OAuthCallbackPage from "../features/auth/pages/OAuthCallbackPage";
 import OnboardingPage from "../features/auth/pages/OnboardingPage";
 import UnauthorizedPage from "../features/auth/pages/UnauthorizedPage";
-import UserManagementPage from "../features/user-management/pages/UserManagementPage";
-import DepartmentManagementPage from "../features/department-management/pages/DepartmentManagementPage";
-import ApprovalSequencePage from "../features/approval-sequence/pages/ApprovalSequencePage";
+import UserManagementPage from "../features/superadmin/user-management/pages/UserManagementPage";
+import DepartmentManagementPage from "../features/superadmin/department-management/pages/DepartmentManagementPage";
+import ApprovalSequencePage from "../features/superadmin/approval-sequence/pages/ApprovalSequencePage";
+import PermissionsPage from "../features/superadmin/permissions/pages/PermissionsPage";
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
-import { RequireAuth, RequirePermission } from "./rbac/guard";
+import { RequireAuth, RequirePermission, RequireRole } from "./rbac/guard";
 import { PERMISSIONS } from "./rbac/permissions";
 import { useAuth } from "../hooks/useAuth";
 
@@ -38,10 +39,10 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/app/inventory",
+    path: "/app/ppmp",
     element: (
       <RequireAuth>
-        <RequirePermission permissions={[PERMISSIONS.INVENTORY.READ]}>
+        <RequirePermission permissions={[PERMISSIONS.PPMP.READ]}>
           <InventoryPage />
         </RequirePermission>
       </RequireAuth>
@@ -54,6 +55,16 @@ export const router = createBrowserRouter([
         <RequirePermission permissions={[PERMISSIONS.USERS.READ]}>
           <UserManagementPage />
         </RequirePermission>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/app/permissions",
+    element: (
+      <RequireAuth>
+        <RequireRole roles={["SuperAdmin"]}>
+          <PermissionsPage />
+        </RequireRole>
       </RequireAuth>
     ),
   },

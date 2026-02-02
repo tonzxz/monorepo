@@ -32,15 +32,54 @@ function readStringFromKeys(
   return null;
 }
 
+function normalizeRole(value: string): Role | null {
+  const key = value.trim().toLowerCase().replace(/[^a-z]/g, "");
+  switch (key) {
+    case "admin":
+      return "SuperAdmin";
+    case "superadmin":
+      return "SuperAdmin";
+    case "user":
+      return "Enduser";
+    case "enduser":
+      return "Enduser";
+    case "supply":
+      return "Supply";
+    case "supplier":
+      return "Supplier";
+    case "inspection":
+      return "Inspection";
+    default:
+      return null;
+  }
+}
+
+function normalizeRoles(values: string[]): Role[] {
+  const normalized = values
+    .map((value) => normalizeRole(value))
+    .filter((value): value is Role => Boolean(value));
+  return Array.from(new Set(normalized));
+}
+
 function createUserFromToken(token: string): User | null {
   try {
     const payload = decodeJwtPayload(token);
     if (!payload) return null;
-
+    const roles = normalizeRoles(extractRoles(payload));
+    const primaryRole =
+      roles.find((role) => role === "SuperAdmin") ??
+      roles.find((role) => role === "Supply") ??
+      roles.find((role) => role === "Supplier") ??
+      roles.find((role) => role === "Inspection") ??
+      roles.find((role) => role === "Enduser") ??
+      "Enduser";
+    const payloadRole =
+      typeof payload.role === "string" ? normalizeRole(payload.role) : null;
+    
     return {
       id: readString(payload, "sub") ?? readString(payload, "id") ?? "",
       email: readString(payload, "email") ?? readString(payload, "user_email") ?? "",
-      role: (payload.role || "Enduser") as Role,
+      role: roles.length ? primaryRole : payloadRole ?? "Enduser",
       firstName:
         readStringFromKeys(payload, ["firstName", "first_name", "given_name", "givenName"]) ??
         undefined,
@@ -57,7 +96,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [token, setTokenState] = useState<string | null>(() => getToken());
   const [roles, setRoles] = useState<string[]>(() => {
     const payload = token ? decodeJwtPayload(token) : null;
-    return extractRoles(payload);
+    return normalizeRoles(extractRoles(payload));
   });
   const [user, setUser] = useState<User | null>(() => {
     return token ? createUserFromToken(token) : null;
@@ -66,7 +105,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const login = (nextToken: string) => {
     setToken(nextToken);
     setTokenState(nextToken);
-    setRoles(extractRoles(decodeJwtPayload(nextToken)));
+    setRoles(normalizeRoles(extractRoles(decodeJwtPayload(nextToken))));
     setUser(createUserFromToken(nextToken));
   };
 

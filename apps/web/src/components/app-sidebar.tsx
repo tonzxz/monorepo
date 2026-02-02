@@ -1,27 +1,22 @@
 import type { ComponentProps } from "react"
 import {
-  BookOpen,
-  Frame,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
-  Settings2,
+  ShieldCheck,
   SquareTerminal,
   Users,
   Building2,
   Package,
   GitBranch,
-  GalleryVerticalEnd,
   type LucideIcon,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { SidebarItems } from "@/components/common/sidebar-items"
 import pcic from "@/assets/pcic.png"
 import type { Permission } from "@/app/rbac/permissions"
+import type { Role } from "@/app/rbac/roles"
 import {
   Sidebar,
   SidebarContent,
@@ -32,13 +27,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/useAuth"
-import { createAbility } from "@/app/rbac/ability"
 import { PERMISSIONS } from "@/app/rbac/permissions"
 
 type NavSubItem = {
   title: string
   url: string
   permission?: Permission
+  roles?: Role[]
 }
 
 type NavItem = {
@@ -47,17 +42,12 @@ type NavItem = {
   icon: LucideIcon
   isActive?: boolean
   permission?: Permission
+  roles?: Role[]
   items?: NavSubItem[]
 }
 
 type SecondaryNavItem = {
   title: string
-  url: string
-  icon: LucideIcon
-}
-
-type ProjectItem = {
-  name: string
   url: string
   icon: LucideIcon
 }
@@ -71,20 +61,20 @@ const navMain: NavItem[] = [
       permission: PERMISSIONS.DASHBOARD.READ,
     },
     {
-      title: "Inventory",
-      url: "/app/inventory",
+      title: "PPMP",
+      url: "/app/ppmp",
       icon: Package,
-      permission: PERMISSIONS.INVENTORY.READ,
+      permission: PERMISSIONS.PPMP.READ,
       items: [
         {
           title: "View Items",
-          url: "/app/inventory",
-          permission: PERMISSIONS.INVENTORY.READ,
+          url: "/app/ppmp",
+          permission: PERMISSIONS.PPMP.READ,
         },
         {
           title: "Add Item",
-          url: "/app/inventory/add",
-          permission: PERMISSIONS.INVENTORY.WRITE,
+          url: "/app/ppmp/add",
+          permission: PERMISSIONS.PPMP.WRITE,
         },
       ],
     },
@@ -93,34 +83,47 @@ const navMain: NavItem[] = [
       url: "/app/users",
       icon: Users,
       permission: PERMISSIONS.USERS.READ,
+      roles: ["SuperAdmin"],
       items: [
         {
           title: "All Users",
           url: "/app/users",
           permission: PERMISSIONS.USERS.READ,
+          roles: ["SuperAdmin"],
         },
         {
           title: "Add User",
           url: "/app/users/add",
           permission: PERMISSIONS.USERS.WRITE,
+          roles: ["SuperAdmin"],
         },
       ],
+    },
+    {
+      title: "Permissions",
+      url: "/app/permissions",
+      icon: ShieldCheck,
+      permission: PERMISSIONS.USERS.READ,
+      roles: ["SuperAdmin"],
     },
     {
       title: "Department Management",
       url: "/app/departments",
       icon: Building2,
       permission: PERMISSIONS.DEPARTMENTS.READ,
+      roles: ["SuperAdmin"],
       items: [
         {
           title: "All Departments",
           url: "/app/departments",
           permission: PERMISSIONS.DEPARTMENTS.READ,
+          roles: ["SuperAdmin"],
         },
         {
           title: "Add Department",
           url: "/app/departments/add",
           permission: PERMISSIONS.DEPARTMENTS.WRITE,
+          roles: ["SuperAdmin"],
         },
       ],
     },
@@ -129,85 +132,19 @@ const navMain: NavItem[] = [
       url: "/app/approval-sequence",
       icon: GitBranch,
       permission: PERMISSIONS.APPROVAL_SEQUENCE.READ,
+      roles: ["SuperAdmin"],
       items: [
         {
           title: "View Sequences",
           url: "/app/approval-sequence",
           permission: PERMISSIONS.APPROVAL_SEQUENCE.READ,
+          roles: ["SuperAdmin"],
         },
         {
           title: "Create Sequence",
           url: "/app/approval-sequence/create",
           permission: PERMISSIONS.APPROVAL_SEQUENCE.WRITE,
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          roles: ["SuperAdmin"],
         },
       ],
     },
@@ -226,24 +163,6 @@ const navSecondary: SecondaryNavItem[] = [
     },
   ]
 
-const projects: ProjectItem[] = [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ]
-
 const data = {
   user: {
     name: "shadcn",
@@ -252,30 +171,12 @@ const data = {
   },
   navMain,
   navSecondary,
-  projects,
 }
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
-  const ability = createAbility(user)
   const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
   const displayName = fullName || user?.email || "User"
-
-  // Filter nav items based on permissions
-  const filteredNavMain = data.navMain.filter(item => {
-    if (item.permission) {
-      return ability.can(item.permission)
-    }
-    return true
-  }).map(item => ({
-    ...item,
-    items: item.items?.filter(subItem => {
-      if (subItem.permission) {
-        return ability.can(subItem.permission)
-      }
-      return true
-    })
-  }))
 
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
@@ -297,8 +198,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={filteredNavMain} />
-        <NavProjects projects={data.projects} />
+        <SidebarItems items={data.navMain} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
