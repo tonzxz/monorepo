@@ -4,10 +4,13 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
+  Moon,
   Sparkles,
+  Sun,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
+import { useTheme } from "next-themes"
 
 import {
   Avatar,
@@ -40,12 +43,18 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const { logout } = useAuth()
+  const { logout, roles } = useAuth()
   const navigate = useNavigate()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const handleLogout = () => {
     logout()
     navigate("/login", { replace: true })
+  }
+
+  const isDark = resolvedTheme === "dark"
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark")
   }
 
   return (
@@ -95,6 +104,21 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+                Roles
+              </DropdownMenuLabel>
+              {roles.length ? (
+                roles.map((role) => (
+                  <DropdownMenuItem key={role} disabled>
+                    {role}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem disabled>No roles</DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
@@ -108,6 +132,11 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={toggleTheme}>
+              {isDark ? <Sun /> : <Moon />}
+              {isDark ? "Light mode" : "Dark mode"}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />

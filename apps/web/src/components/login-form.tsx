@@ -55,7 +55,7 @@ export function LoginForm({
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isRegisterMode) {
-      registerMutation.mutate({ email, password, address, role: "User" });
+      registerMutation.mutate({ email, password, address, role: "Enduser" });
     } else {
       loginMutation.mutate({ email, password });
     }

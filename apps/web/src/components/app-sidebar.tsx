@@ -1,7 +1,6 @@
+import type { ComponentProps } from "react"
 import {
   BookOpen,
-  Bot,
-  Command,
   Frame,
   LifeBuoy,
   Map,
@@ -14,12 +13,15 @@ import {
   Package,
   GitBranch,
   GalleryVerticalEnd,
+  type LucideIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import pcic from "@/assets/pcic.png"
+import type { Permission } from "@/app/rbac/permissions"
 import {
   Sidebar,
   SidebarContent,
@@ -33,13 +35,34 @@ import { useAuth } from "@/hooks/useAuth"
 import { createAbility } from "@/app/rbac/ability"
 import { PERMISSIONS } from "@/app/rbac/permissions"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
+type NavSubItem = {
+  title: string
+  url: string
+  permission?: Permission
+}
+
+type NavItem = {
+  title: string
+  url: string
+  icon: LucideIcon
+  isActive?: boolean
+  permission?: Permission
+  items?: NavSubItem[]
+}
+
+type SecondaryNavItem = {
+  title: string
+  url: string
+  icon: LucideIcon
+}
+
+type ProjectItem = {
+  name: string
+  url: string
+  icon: LucideIcon
+}
+
+const navMain: NavItem[] = [
     {
       title: "Dashboard",
       url: "/app",
@@ -188,8 +211,9 @@ const data = {
         },
       ],
     },
-  ],
-  navSecondary: [
+  ]
+
+const navSecondary: SecondaryNavItem[] = [
     {
       title: "Support",
       url: "#",
@@ -200,8 +224,9 @@ const data = {
       url: "#",
       icon: Send,
     },
-  ],
-  projects: [
+  ]
+
+const projects: ProjectItem[] = [
     {
       name: "Design Engineering",
       url: "#",
@@ -217,12 +242,24 @@ const data = {
       url: "#",
       icon: Map,
     },
-  ],
+  ]
+
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  navMain,
+  navSecondary,
+  projects,
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
   const ability = createAbility(user)
+  const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
+  const displayName = fullName || user?.email || "User"
 
   // Filter nav items based on permissions
   const filteredNavMain = data.navMain.filter(item => {
@@ -241,16 +278,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }))
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <GalleryVerticalEnd className="size-4" />
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
+                  <img src={pcic} alt="PCIC" className="size-6 object-contain" />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-medium">PCIC</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
@@ -266,7 +303,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{
-          name: user?.email || "User",
+          name: displayName,
           email: user?.email || "",
           avatar: "/avatars/shadcn.jpg",
         }} />

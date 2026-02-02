@@ -16,15 +16,37 @@ type AuthContextValue = {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
+function readString(payload: Record<string, unknown>, key: string): string | null {
+  const value = payload[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function readStringFromKeys(
+  payload: Record<string, unknown>,
+  keys: string[]
+): string | null {
+  for (const key of keys) {
+    const value = readString(payload, key);
+    if (value) return value;
+  }
+  return null;
+}
+
 function createUserFromToken(token: string): User | null {
   try {
     const payload = decodeJwtPayload(token);
     if (!payload) return null;
-    
+
     return {
-      id: payload.sub || payload.id || "",
-      email: payload.email || payload.user_email || "",
-      role: (payload.role || "User") as Role,
+      id: readString(payload, "sub") ?? readString(payload, "id") ?? "",
+      email: readString(payload, "email") ?? readString(payload, "user_email") ?? "",
+      role: (payload.role || "Enduser") as Role,
+      firstName:
+        readStringFromKeys(payload, ["firstName", "first_name", "given_name", "givenName"]) ??
+        undefined,
+      lastName:
+        readStringFromKeys(payload, ["lastName", "last_name", "family_name", "familyName"]) ??
+        undefined,
     };
   } catch {
     return null;

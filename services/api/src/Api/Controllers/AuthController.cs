@@ -13,7 +13,7 @@ namespace Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private static readonly string[] AllowedRoles = ["User", "Admin"];
+    private static readonly string[] AllowedRoles = ["Enduser", "SuperAdmin", "Supply", "Supplier", "Inspection"];
 
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
     {
-        var role = string.IsNullOrWhiteSpace(request.Role) ? "User" : request.Role.Trim();
+        var role = string.IsNullOrWhiteSpace(request.Role) ? "Enduser" : request.Role.Trim();
         if (!AllowedRoles.Contains(role))
         {
             return BadRequest($"Role '{role}' is not allowed.");
@@ -173,7 +173,7 @@ public class AuthController : ControllerBase
         }
 
         // Add default role
-        await _userManager.AddToRoleAsync(newUser, "User");
+        await _userManager.AddToRoleAsync(newUser, "SuperAdmin");
 
         // Link external login
         var addLoginResult = await _userManager.AddLoginAsync(newUser, info);

@@ -1,4 +1,5 @@
 import { ChevronRight, type LucideIcon } from "lucide-react"
+import type { Permission } from "@/app/rbac/permissions"
 
 import {
   Collapsible,
@@ -28,7 +29,9 @@ export function NavMain({
     items?: {
       title: string
       url: string
+      permission?: Permission
     }[]
+    permission?: Permission
   }[]
 }) {
   return (

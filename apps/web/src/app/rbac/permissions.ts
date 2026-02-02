@@ -16,7 +16,7 @@ export type Permission =
   | "approval-sequence:delete";
 
 export const rolePermissions: Record<Role, Permission[]> = {
-  Admin: [
+  SuperAdmin: [
     "dashboard:read",
     "inventory:read",
     "inventory:write",
@@ -31,17 +31,23 @@ export const rolePermissions: Record<Role, Permission[]> = {
     "approval-sequence:write",
     "approval-sequence:delete"
   ],
-  Manager: [
+  Supply: [
     "dashboard:read",
     "inventory:read",
     "inventory:write",
-    "users:read",
-    "departments:read",
-    "departments:write",
-    "approval-sequence:read",
-    "approval-sequence:write"
+    "approval-sequence:read"
   ],
-  User: [
+  Supplier: [
+    "dashboard:read",
+    "inventory:read",
+    "approval-sequence:read"
+  ],
+  Inspection: [
+    "dashboard:read",
+    "inventory:read",
+    "approval-sequence:read"
+  ],
+  Enduser: [
     "dashboard:read",
     "inventory:read"
   ]

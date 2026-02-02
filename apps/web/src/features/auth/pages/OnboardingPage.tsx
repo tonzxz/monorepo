@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { updateProfile } from "@/lib/api/auth";
@@ -23,9 +23,11 @@ export default function OnboardingPage() {
     onSuccess: () => {
       navigate("/app", { replace: true });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Profile update error:", error);
-      setErrorMessage(error.message || "Failed to update profile. Please try again.");
+      const message =
+        error instanceof Error ? error.message : "Failed to update profile. Please try again.";
+      setErrorMessage(message);
     },
   });
 

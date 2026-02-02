@@ -1,13 +1,17 @@
-export type Role = "Admin" | "User" | "Manager";
+export type Role = "SuperAdmin" | "Enduser" | "Supply" | "Supplier" | "Inspection";
 
 export const ROLES: Record<Role, string> = {
-  Admin: "Admin",
-  User: "User",
-  Manager: "Manager"
+  SuperAdmin: "SuperAdmin",
+  Enduser: "Enduser",
+  Supply: "Supply",
+  Supplier: "Supplier",
+  Inspection: "Inspection"
 };
 
 export const roleHierarchy: Record<Role, Role[]> = {
-  Admin: ["Admin", "Manager", "User"],
-  Manager: ["Manager", "User"],  
-  User: ["User"]
+  SuperAdmin: ["SuperAdmin", "Supply", "Supplier", "Inspection", "Enduser"],
+  Supply: ["Supply", "Enduser"],
+  Supplier: ["Supplier", "Enduser"],
+  Inspection: ["Inspection", "Enduser"],
+  Enduser: ["Enduser"]
 };

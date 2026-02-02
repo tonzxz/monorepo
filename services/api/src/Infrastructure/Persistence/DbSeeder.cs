@@ -34,7 +34,7 @@ public static class DbSeeder
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
     {
-        var roles = new[] { "User", "Admin", "Manager" };
+        var roles = new[] {"SuperAdmin", "Enduser", "Supply", "Supplier", "Inspection" };
         
         foreach (var role in roles)
         {
@@ -48,7 +48,7 @@ public static class DbSeeder
 
     private static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
     {
-        var adminEmail = "admin@psms.com";
+        var adminEmail = "admin@quanbyit.com";
         
         if (await userManager.FindByEmailAsync(adminEmail) == null)
         {
@@ -61,11 +61,11 @@ public static class DbSeeder
 
             };
 
-            var result = await userManager.CreateAsync(admin, "Admin@123456");
+            var result = await userManager.CreateAsync(admin, "@Test123");
             
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(admin, "Admin");
+                await userManager.AddToRoleAsync(admin, "SuperAdmin");
                 Console.WriteLine($"Created admin user: {adminEmail}");
             }
             else
@@ -79,7 +79,7 @@ public static class DbSeeder
     {
         if (!context.InventoryItems.Any())
         {
-            var admin = context.Users.FirstOrDefault(u => u.Email == "admin@psms.com");
+            var admin = context.Users.FirstOrDefault(u => u.Email == "admin@quanbyit.com");
             
             if (admin != null)
             {

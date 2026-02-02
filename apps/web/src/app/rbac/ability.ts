@@ -8,6 +8,8 @@ export interface User {
   email: string;
   role: Role;
   permissions?: Permission[];
+  firstName?: string;
+  lastName?: string;
 }
 
 export class Ability {

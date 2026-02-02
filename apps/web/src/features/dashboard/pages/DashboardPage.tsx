@@ -54,7 +54,7 @@ export default function DashboardPage() {
               {getGreeting()}
             </h1>
             <p className="text-muted-foreground mt-2">
-              You're signed in as <span className="font-medium">{user?.email}</span> with the role: <span className="font-semibold capitalize">{user?.role || 'User'}</span>
+                You're signed in as <span className="font-medium">{user?.email}</span> with the role: <span className="font-semibold capitalize">{user?.role || "Enduser"}</span>
             </p>
             <p className="text-muted-foreground mt-1">
               Here's what's happening with your inventory today.
